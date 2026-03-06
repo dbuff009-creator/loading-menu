@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Загрузка | Строй I Убивай</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+background:#000;
+color:#fff;
+font-family:Roboto,sans-serif;
+height:100vh;
+overflow:hidden;
+}
+
+/* particles */
+
+.particles{
+position:absolute;
+inset:0;
+overflow:hidden;
+pointer-events:none;
+}
+
+.particle{
+position:absolute;
+background:white;
+border-radius:50%;
+opacity:.3;
+animation:floatParticle linear infinite, twinkle 4s infinite;
+}
+
+/* logo */
+
+.logo{
+position:absolute;
+top:200px;
+left:20%;
+font-size:80px;
+font-weight:900;
+}
+
+/* status */
+
+.status{
+position:absolute;
+top:300px;
+left:20%;
+opacity:.7;
+}
+
+/* layout */
+
+.layout{
+position:absolute;
+top:350px;
+left:20%;
+right:20%;
+display:flex;
+justify-content:space-between;
+}
+
+/* titles */
+
+.section-title{
+font-size:24px;
+margin-bottom:44px;
+letter-spacing:2px;
+}
+
+.section-title2{
+font-size:24px;
+margin-bottom:25px;
+letter-spacing:2px;
+}
+
+/* rules */
+
+.rules-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+width:520px;
+}
+
+.rule-card{
+background:#111;
+padding:18px 20px;
+border-radius:12px;
+display:flex;
+align-items:center;
+gap:15px;
+transition:.3s;
+}
+
+.rule-card:hover{
+background:#181818;
+transform:translateY(-2px);
+}
+
+.rule-number{
+width:30px;
+height:30px;
+background:#1a1a1a;
+border-radius:6px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:700;
+}
+
+/* right column */
+
+.right{
+width:420px;
+}
+
+.info-card{
+background:#111;
+padding:18px;
+border-radius:12px;
+margin-bottom:20px;
+display:flex;
+align-items:center;
+gap:12px;
+transition:.3s;
+}
+
+.info-card i{
+opacity:.8;
+font-size:18px;
+}
+
+.info-card:hover{
+background:#181818;
+transform:translateX(5px);
+}
+
+/* tips */
+
+.tips{
+position:absolute;
+bottom:90px;
+left:50%;
+transform:translateX(-50%);
+font-size:20px;
+opacity:0;
+transition:opacity .8s ease, transform .8s ease;
+}
+
+.tips.show{
+opacity:.9;
+}
+
+/* bottom text */
+
+.bottom-text{
+position:absolute;
+bottom:50px;
+left:50%;
+transform:translateX(-50%);
+opacity:.6;
+}
+
+/* loading bar */
+
+.loading-bar{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+height:8px;
+background:#111;
+overflow:hidden;
+}
+
+.progress{
+height:100%;
+background:#fff;
+animation:loading 3s linear infinite;
+}
+
+/* animations */
+
+@keyframes loading{
+0%{transform:translateX(-100%)}
+100%{transform:translateX(100%)}
+}
+
+@keyframes twinkle{
+0%,100%{opacity:.1;}
+50%{opacity:.6;}
+}
+
+@keyframes floatParticle{
+0%{transform:translateY(0);}
+100%{transform:translateY(-120vh);}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="particles" id="particles"></div>
+
+<div class="logo">СТРОЙ I УБИВАЙ</div>
+<div class="status">сервер загружается...</div>
+
+<div class="layout">
+
+<div class="left">
+
+<div class="section-title2">ВАЖНЫЕ ПРАВИЛА:</div>
+
+<div class="rules-grid">
+
+<div class="rule-card">
+<div class="rule-number">1.1</div>
+Запрещено создавать помеху другим игрокам.
+</div>
+
+<div class="rule-card">
+<div class="rule-number">1.2</div>
+Запрещено своими действиями нарушать функционирование сервера.
+</div>
+
+<div class="rule-card">
+<div class="rule-number">1.4</div>
+Проп пуш, проп блок и проп серфинг запрещены.
+</div>
+
+<div class="rule-card">
+<div class="rule-number">1.8</div>
+Запрещено покидать разборки обвиняемому.
+</div>
+
+</div>
+</div>
+
+<div class="right">
+
+<div class="section-title">СОЦ. СЕТИ:</div>
+
+<div class="info-card">
+<i class="fab fa-discord"></i>
+https://discord.gg/haWyf5ftkS
+</div>
+
+<div class="info-card">
+<i class="fas fa-folder"></i>
+https://clc.li/EBQwc
+</div>
+
+<div class="info-card">
+<i class="fas fa-book"></i>
+https://golnk.ru/zZq72
+</div>
+
+</div>
+
+</div>
+
+<div class="tips" id="tip"></div>
+
+<div class="bottom-text">
+Не выключай игру, загрузка может занять до 5 минут
+</div>
+
+<div class="loading-bar">
+<div class="progress"></div>
+</div>
+
+<script>
+
+/* particles */
+
+const container=document.getElementById("particles");
+
+for(let i=0;i<80;i++){
+
+let p=document.createElement("div");
+p.className="particle";
+
+let size=Math.random()*3+1;
+p.style.width=size+"px";
+p.style.height=size+"px";
+
+p.style.left=Math.random()*100+"vw";
+p.style.top=Math.random()*100+"vh";
+
+p.style.animationDuration=(Math.random()*20+15)+"s";
+
+container.appendChild(p);
+}
+
+/* tips */
+
+const tips=[
+"Ты видишь мой скин?",
+"Физ будет снят",
+"Лсд симулятор - у вас не будет прихода",
+"Биг папик следит за тобой",
+"ГдЕ пАнДуС"
+];
+
+function shuffle(array){
+for(let i=array.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[array[i],array[j]]=[array[j],array[i]];
+}
+return array;
+}
+
+const tip=document.getElementById("tip");
+
+let shuffledTips = shuffle([...tips]);
+let tipIndex = 0;
+
+function changeTip(){
+
+tip.classList.remove("show");
+
+setTimeout(()=>{
+tip.textContent = shuffledTips[tipIndex];
+tipIndex++;
+
+if(tipIndex >= shuffledTips.length){
+shuffledTips = shuffle([...tips]);
+tipIndex = 0;
+}
+
+tip.classList.add("show");
+
+},400);
+}
+
+/* start */
+
+tip.textContent = shuffledTips[0];
+setTimeout(()=>tip.classList.add("show"),200);
+
+setInterval(changeTip,6000);
+
+</script>
+
+</body>
+</html>
