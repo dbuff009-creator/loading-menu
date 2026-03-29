@@ -5,44 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Загрузка</title>
 
-<link rel="preload" href="font/Benzin-Bold.ttf" as="font" type="font/ttf" crossorigin>
+<!-- preload -->
+<link rel="preload" href="font/benzin.ttf" as="font" type="font/ttf" crossorigin>
 
 <style>
 
+/* === FONT (ОДИН ФАЙЛ) === */
 @font-face{
 font-family:"Benzin";
-src:url("font/Benzin-Regular.ttf") format("truetype");
-font-weight:400;
+src:url("font/benzin.ttf") format("truetype");
+font-weight:normal;
+font-style:normal;
 font-display:swap;
 }
 
-@font-face{
-font-family:"Benzin";
-src:url("font/Benzin-Medium.ttf") format("truetype");
-font-weight:500;
-font-display:swap;
-}
-
-@font-face{
-font-family:"Benzin";
-src:url("font/Benzin-Semibold.ttf") format("truetype");
-font-weight:600;
-font-display:swap;
-}
-
-@font-face{
-font-family:"Benzin";
-src:url("font/Benzin-Bold.ttf") format("truetype");
-font-weight:700;
-font-display:swap;
-}
-
-@font-face{
-font-family:"Benzin";
-src:url("font/Benzin-ExtraBold.ttf") format("truetype");
-font-weight:800;
-font-display:swap;
-}
 /* === BASE === */
 *{
 margin:0;
@@ -53,7 +29,7 @@ box-sizing:border-box;
 body{
 background:#000;
 color:#fff;
-font-family:"Benzin", sans-serif;
+font-family:"Benzin", Arial, sans-serif;
 height:100vh;
 display:flex;
 justify-content:center;
@@ -69,24 +45,47 @@ transform:translateY(20px);
 animation:fadeUp 1s ease forwards;
 }
 
+/* === TITLE === */
 .title{
-font-weight:800;
+font-family:"Benzin", sans-serif;
 font-size:64px;
 letter-spacing:3px;
 }
 
+/* === STATUS === */
 .status{
 margin-top:12px;
 font-size:13px;
 opacity:.4;
 letter-spacing:2px;
-font-weight:500;
+}
+
+/* === TIPS === */
+.tips{
+position:fixed;
+bottom:80px;
+left:50%;
+transform:translateX(-50%) translateY(10px);
+font-size:14px;
+letter-spacing:1px;
+opacity:0;
+filter:blur(6px);
+transition:
+opacity .8s ease,
+transform .8s ease,
+filter .8s ease;
+}
+
+.tips.show{
+opacity:.35;
+transform:translateX(-50%) translateY(0);
+filter:blur(0);
 }
 
 /* === BAR === */
 .bar{
 position:fixed;
-bottom:30px;
+bottom:20px;
 left:50%;
 transform:translateX(-50%);
 width:120px;
@@ -104,23 +103,6 @@ width:40px;
 height:100%;
 background:#fff;
 animation:load 1.2s linear infinite;
-}
-
-/* === TIPS (мемы) === */
-.tips{
-position:fixed;
-bottom:70px;
-left:50%;
-transform:translateX(-50%);
-font-size:14px;
-opacity:0;
-letter-spacing:1px;
-transition:opacity .5s ease, transform .5s ease;
-}
-
-.tips.show{
-opacity:.35;
-transform:translateX(-50%) translateY(0);
 }
 
 /* === ANIMATIONS === */
@@ -154,6 +136,8 @@ to{opacity:1;}
 <div class="bar"></div>
 
 <script>
+
+/* === МЕМЫ === */
 const tips = [
 "Ты видишь мой скин?",
 "Физ будет снят",
@@ -189,12 +173,12 @@ shuffled = shuffle([...tips]);
 index = 0;
 }
 
-}, 400); // задержка перед появлением
+}, 400);
 }
 
-/* старт */
 showTip();
-setInterval(showTip, 5500); // МЕДЛЕННЕЕ
+setInterval(showTip, 5500);
+
 </script>
 
 </body>
