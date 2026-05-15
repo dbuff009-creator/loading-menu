@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMod Loading Screen</title>
+    <!-- Подключаем Tailwind для дизайна -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: #000; overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white; text-transform: uppercase;
+        }
+        .bg-slide {
+            position: absolute; inset: 0;
+            background-size: cover; background-position: center;
+            transition: opacity 2s ease-in-out, transform 10s linear;
+            opacity: 0; transform: scale(1.1);
+        }
+        .bg-slide.active { opacity: 0.4; transform: scale(1); }
+        .noise {
+            position: absolute; inset: 0; z-index: 30; pointer-events: none;
+            opacity: 0.03; background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+        }
+        .gradient-overlay {
+            position: absolute; inset-y: 0; left: 0; width: 600px;
+            background: linear-gradient(to right, rgba(0,0,0,1), rgba(0,0,0,0.5), transparent);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Слайдшоу -->
+    <div id="slideshow-container"></div>
+    
+    <!-- Градиент -->
+    <div class="gradient-overlay"></div>
+    <div class="noise"></div>
+
+    <!-- Контент -->
+    <div class="relative z-20 flex flex-col justify-end h-full p-20 gap-10">
+        <div>
+            <h1 id="server-name" class="text-7xl font-black italic tracking-tighter leading-none m-0">
+                СТРОЙ / УБИВАЙ
+            </h1>
+            <div class="flex items-center gap-3 opacity-30 mt-4">
+                <div class="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                <span class="text-[10px] tracking-[0.5em] font-bold">ПОДКЛЮЧЕНИЕ...</span>
+            </div>
+        </div>
+
+        <div class="flex gap-16 border-l-2 border-white/10 pl-10">
+            <div class="flex flex-col">
+                <span class="text-[10px] tracking-widest text-white/30 font-black mb-1">ИГРОКИ</span>
+                <span id="player-count" class="text-3xl font-light">0 <span class="opacity-10">/ 128</span></span>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-[10px] tracking-widest text-white/30 font-black mb-1">КАРТА</span>
+                <span id="map-name" class="text-3xl font-light tracking-tight">ЗАГРУЗКА...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DROPBOX_TOKEN = 'sl.u.AGdN_-VCkRfTPhVV0u0E6U565edR0JY0tpqXGy3ldcjLvxEuJjeKS5EljbieaxRhdFQQfeoVsKy89tMLFpQBNoHGWDkKNcNlWkn5xOdtoC1_lCNRW-ELBzjDVY3VnPfqralBn7ilpqlzo_FnI2d_8XlT24sbJKL8XEy9LeQs9eazoRgPLKAfRSkUpjUVMCcZkjxg4chUVA36_iKzN6oUUGRg187Yt9X0U4vnkgdRLDILLpgC8LNMbN0ZgASjsPhzrlM1U35NQin115YAHtpSrQC7AYlXmgmhc2SD2Doijbc4PQLQIEwkmW2NqTrAMfBwZzU5hLufhh4NkhSQL_3SElWcIIcuQ1rjgtLIJfxsu_S-VZzqKybQY6LO-6RGwvcQJspUnhz68R6pcyZn33HuQ0o3xBJwH3tz6B51uiO0k_xK3WP4b73sXV4XAQnNUtVcoQymHAy87DbgGhHSI1_T0CQOviGoBhcbd6outG1m36O7Pw9QEWgJNdRS44LNbhVXcI5EJY1tO3zOsaUhQ97HwApNPf5w1Z1vS2TBNv_QjDa_vukxd-bAdyLhAlCTdyzSGoJvWKeIExj10kh5SApQlIXK6s50vn53PM8BlcjS4eeU7pDU7IVMuG9Q3_K5w3j5Rzqn6HAt92nFX0z3i4Idl40021GQ643F5CjIT6ngZHjUeP6DbmVJ5Y1KM1xjzR5DVYxB0uOjnGWtLM6pOo3U9btLRMgk9BcMzY29WIylURzTHtafiAzmuU1-OrYT_Co9TJRP4yCPiO_fBL6mQX8yMlUKTQeNNUBOe1GZxUV2sDlLUENVx1xQu_QwnIAXPSuZBM8qkQNfcKMM6vTFR1MQNMzS2qfPEJVzMiBU5YvolEWmfJ7NJMv5XoZvsXYfn6g13rBq93jN0KKwpGL28_UmTWHZtjlRcoYmhUwOmxIyKdE3tGgfapf_CpXGbu6CWczFnEQLh8Ge3KHNH4pVqn-6cjo2oTUVvsUVsKmPHzfY86n-HTgY77nzQpfbLUV_FFl0rykO5xkxvzp4V_DPuTy-fKn_FXOV5vlALx6Rv8tzjDz-YKL0XZn-PmzGSY6Mf0Es63oaiH_QsKEWO30-v-KajFuNqKW6Wyc-If3hplrtuA2BjpSu90E2XXIyfT8|

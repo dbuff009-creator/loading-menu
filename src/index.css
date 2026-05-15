@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background-color: black;
+  overflow: hidden;
+  cursor: default; /* Changed back to default for better usability in web env */
+}
+
+* {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+

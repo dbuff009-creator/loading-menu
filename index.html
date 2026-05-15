@@ -1,203 +1,127 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Загрузка</title>
-
-<!-- preload -->
-<link rel="preload" href="font/Benzin-Medium.ttf" as="font" type="font/ttf" crossorigin>
-
-<style>
-
-/* === FONT (ОДИН ФАЙЛ) === */
-@font-face{
-font-family:"Benzin";
-src:url("font/Benzin-Medium.ttf") format("truetype");
-font-weight:normal;
-font-style:normal;
-font-display:swap;
-}
-
-@font-face{
-font-family:"BenzinB";
-src:url("font/Benzin-Bold.ttf") format("truetype");
-font-weight:normal;
-font-style:normal;
-font-display:swap;
-}
-
-@font-face{
-font-family:"BenzinL";
-src:url("font/Benzin-Regular.ttf") format("truetype");
-font-weight:normal;
-font-style:normal;
-font-display:swap;
-}
-
-
-/* === BASE === */
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
-
-body{
-background:#000;
-color:#fff;
-font-family:"Benzin", Arial, sans-serif;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-overflow:hidden;
-}
-
-/* === CENTER === */
-.center{
-text-align:center;
-opacity:0;
-transform:translateY(20px);
-animation:fadeUp 1s ease forwards;
-}
-
-/* === TITLE === */
-.title{
-font-family:"BenzinB", sans-serif;
-font-size:64px;
-letter-spacing:3px;
-}
-
-/* === STATUS === */
-.status{
-margin-top:12px;
-font-size:13px;
-opacity:.4;
-letter-spacing:2px;
-}
-
-/* === TIPS === */
-.tips{
-position:fixed;
-font-family:"BenzinL", sans-serif;
-bottom:80px;
-left:50%;
-transform:translateX(-50%) translateY(10px);
-font-size:14px;
-letter-spacing:1px;
-opacity:0;
-filter:blur(6px);
-transition:
-opacity .8s ease,
-transform .8s ease,
-filter .8s ease;
-}
-
-.tips.show{
-opacity:.35;
-transform:translateX(-50%) translateY(0);
-filter:blur(0);
-}
-
-/* === BAR === */
-.bar{
-position:fixed;
-bottom:20px;
-left:50%;
-transform:translateX(-50%);
-width:120px;
-height:2px;
-background:#111;
-overflow:hidden;
-opacity:0;
-animation:fadeIn 1s ease forwards .5s;
-}
-
-.bar::after{
-content:"";
-position:absolute;
-width:40px;
-height:100%;
-background:#fff;
-animation:load 1.2s linear infinite;
-}
-
-/* === ANIMATIONS === */
-@keyframes load{
-0%{left:-40px}
-100%{left:100%}
-}
-
-@keyframes fadeUp{
-to{
-opacity:1;
-transform:translateY(0);
-}
-}
-
-@keyframes fadeIn{
-to{opacity:1;}
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMod Loading Screen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: #000; overflow: hidden;
+            font-family: system-ui, -apple-system, sans-serif;
+            color: white; text-transform: uppercase;
+        }
+        .bg-slide {
+            position: absolute; inset: 0;
+            background-size: cover; background-position: center;
+            transition: opacity 2s ease-in-out;
+            opacity: 0;
+        }
+        .bg-slide.active { opacity: 0.4; }
+        .gradient-overlay {
+            position: absolute; inset-y: 0; left: 0; width: 600px;
+            background: linear-gradient(to right, rgba(0,0,0,1), rgba(0,0,0,0.4), transparent);
+            z-index: 10;
+        }
+    </style>
 </head>
-
 <body>
+    <div id="slideshow"></div>
+    <div class="gradient-overlay"></div>
 
-<div class="center">
-<div class="title">СТРОЙ I УБИВАЙ</div>
-<div class="status">загрузка</div>
-</div>
+    <div class="relative z-20 flex flex-col justify-end h-full p-20 gap-8">
+        <div>
+            <h1 class="text-7xl font-black italic tracking-tighter leading-none m-0">СТРОЙ / УБИВАЙ</h1>
+            <div class="flex items-center gap-3 opacity-30 mt-4">
+                <div class="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                <span class="text-[10px] tracking-[0.5em] font-bold">ПОДКЛЮЧЕНИЕ К СЕРВЕРУ</span>
+            </div>
+        </div>
 
-<div class="tips" id="tip"></div>
-<div class="bar"></div>
+        <div class="flex gap-16 border-l-2 border-white/10 pl-10">
+            <div class="flex flex-col">
+                <span class="text-[10px] tracking-widest text-white/30 font-black mb-1">ИГРОКИ</span>
+                <span id="players" class="text-3xl font-light">0 / 0</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-[10px] tracking-widest text-white/30 font-black mb-1">КАРТА</span>
+                <span id="map" class="text-3xl font-light tracking-tight">ЗАГРУЗКА...</span>
+            </div>
+        </div>
+    </div>
 
-<script>
+    <script>
+        const DROPBOX_TOKEN = 'sl.u.AGdN_-VCkRfTPhVV0u0E6U565edR0JY0tpqXGy3ldcjLvxEuJjeKS5EljbieaxRhdFQQfeoVsKy89tMLFpQBNoHGWDkKNcNlWkn5xOdtoC1_lCNRW-ELBzjDVY3VnPfqralBn7ilpqlzo_FnI2d_8XlT24sbJKL8XEy9LeQs9eazoRgPLKAfRSkUpjUVMCcZkjxg4chUVA36_iKzN6oUUGRg187Yt9X0U4vnkgdRLDILLpgC8LNMbN0ZgASjsPhzrlM1U35NQin115YAHtpSrQC7AYlXmgmhc2SD2Doijbc4PQLQIEwkmW2NqTrAMfBwZzU5hLufhh4NkhSQL_3SElWcIIcuQ1rjgtLIJfxsu_S-VZzqKybQY6LO-6RGwvcQJspUnhz68R6pcyZn33HuQ0o3xBJwH3tz6B51uiO0k_xK3WP4b73sXV4XAQnNUtVcoQymHAy87DbgGhHSI1_T0CQOviGoBhcbd6outG1m36O7Pw9QEWgJNdRS44LNbhVXcI5EJY1tO3zOsaUhQ97HwApNPf5w1Z1vS2TBNv_QjDa_vukxd-bAdyLhAlCTdyzSGoJvWKeIExj10kh5SApQlIXK6s50vn53PM8BlcjS4eeU7pDU7IVMuG9Q3_K5w3j5Rzqn6HAt92nFX0z3i4Idl40021GQ643F5CjIT6ngZHjUeP6DbmVJ5Y1KM1xjzR5DVYxB0uOjnGWtLM6pOo3U9btLRMgk9BcMzY29WIylURzTHtafiAzmuU1-OrYT_Co9TJRP4yCPiO_fBL6mQX8yMlUKTQeNNUBOe1GZxUV2sDlLUENVx1xQu_QwnIAXPSuZBM8qkQNfcKMM6vTFR1MQNMzS2qfPEJVzMiBU5YvolEWmfJ7NJMv5XoZvsXYfn6g13rBq93jN0KKwpGL28_UmTWHZtjlRcoYmhUwOmxIyKdE3tGgfapf_CpXGbu6CWczFnEQLh8Ge3KHNH4pVqn-6cjo2oTUVvsUVsKmPHzfY86n-HTgY77nzQpfbLUV_FFl0rykO5xkxvzp4V_DPuTy-fKn_FXOV5vlALx6Rv8tzjDz-YKL0XZn-PmzGSY6Mf0Es63oaiH_QsKEWO30-v-KajFuNqKW6Wyc-If3hplrtuA2BjpSu90E2XXIyfT8nWgZ3unmMfSri-B3TtoO07NYVPDb-2ZDsvjLFfCB8VH1VXkeR2dmAHHpd8JdQQvC6bUC0XhVhqjOUKF1o4PHqhNx5sd3KiQJSSmIrP-aR1jQHnaDXCnZ-p4_ReiVNGyaA0KpoIyLcvB1kU4dGtVT6D3hcT1-j45h97wLFRELC2ZpIcXmeBQNcISNZRP2VpU7wvNjBiK6d_0nHibVqsYfO0FxMprIKM8NpxjdSyYxhGx745qTcvWwElqUKH7KVhd_y3OKA_JxTSgs_WaXPwdIxZ2vS2XGw';
+        let images = [
+            'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1600',
+            'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600'
+        ];
+        let currentIndex = 0;
 
-/* === МЕМЫ === */
-const tips = [
-"Ты видишь мой скин?",
-"Физ будет снят",
-"Лсд симулятор прихода не будет",
-"Большой папик смотрит",
-"Где пандус?",
-"Анша абдуль",
-"Надо ссать на клетку забаненых и все в жизни будет хорошо",
-"Лоадинг супер кодер...",
-"Эксплуатация харкев запрещена"
-];
+        async function loadDropbox() {
+            try {
+                const r = await fetch('https://api.dropboxapi.com/2/files/list_folder', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${DROPBOX_TOKEN}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path: '/Photos' })
+                });
+                const d = await r.json();
+                if (d.entries) {
+                    const files = d.entries.filter(f => f['.tag'] === 'file').slice(0, 5);
+                    const urls = [];
+                    for (const f of files) {
+                        const lr = await fetch('https://api.dropboxapi.com/2/files/get_temporary_link', {
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${DROPBOX_TOKEN}`, 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ path: f.path_lower })
+                        });
+                        const ld = await lr.json();
+                        if (ld.link) urls.push(ld.link);
+                    }
+                    if (urls.length > 0) {
+                        images = urls;
+                        renderSlides();
+                    }
+                }
+            } catch(e) { console.log('Using default images'); renderSlides(); }
+        }
 
-function shuffle(arr){
-return arr.sort(() => Math.random() - 0.5);
-}
+        async function updateServer() {
+            try {
+                const r = await fetch('https://api.gamemonitoring.ru/servers/11327074');
+                const d = await r.json();
+                if (d.response) {
+                    document.getElementById('players').innerText = `${d.response.numplayers} / ${d.response.maxplayers}`;
+                    document.getElementById('map').innerText = d.response.map;
+                }
+            } catch(e) {}
+        }
 
-let shuffled = shuffle([...tips]);
-let index = 0;
+        function renderSlides() {
+            const container = document.getElementById('slideshow');
+            container.innerHTML = '';
+            images.forEach((src, i) => {
+                const div = document.createElement('div');
+                div.className = 'bg-slide' + (i === 0 ? ' active' : '');
+                div.style.backgroundImage = `url('${src}')`;
+                container.appendChild(div);
+            });
+        }
 
-const tipEl = document.getElementById("tip");
+        function startSlideshow() {
+            setInterval(() => {
+                const slides = document.querySelectorAll('.bg-slide');
+                slides[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % slides.length;
+                slides[currentIndex].classList.add('active');
+            }, 6000);
+        }
 
-function showTip(){
-tipEl.classList.remove("show");
-
-setTimeout(() => {
-tipEl.textContent = shuffled[index];
-tipEl.classList.add("show");
-
-index++;
-
-if(index >= shuffled.length){
-shuffled = shuffle([...tips]);
-index = 0;
-}
-
-}, 400);
-}
-
-showTip();
-setInterval(showTip, 5500);
-
-</script>
-
+        loadDropbox();
+        updateServer();
+        setInterval(updateServer, 20000);
+        startSlideshow();
+    </script>
 </body>
 </html>
